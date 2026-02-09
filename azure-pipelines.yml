@@ -1,0 +1,61 @@
+# Azure Pipeline to build api and push Docker Image to Azure Container Registry
+trigger:
+- main
+variables:
+# Docker
+  containerRegistry: 'ranpak-lbi-docker'
+  tag: $(Build.BuildId)
+  containerRepo: ranpaklbidocker.azurecr.io
+  imageRepository: ranpaktrak-api
+
+  # Web App
+  webAppName: 'ranpaktrak-dev-api'
+  azureSubscription: 'ranpak-build'
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+  # Maven
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+
+stages:
+- stage: BuildApp
+  displayName: Build app
+  jobs:
+  - job: BuildAppAndPush
+    displayName: Build App and Push Docker Image
+    pool:
+      vmImage: $(vmImageName)
+
+    steps:
+    - task: Cache@2
+      displayName: Cache Maven local repo
+      inputs:
+        key: 'maven | "$(Agent.OS)" | api/pom.xml'
+        restoreKeys: |
+          maven | "$(Agent.OS)"
+          maven
+        path: $(MAVEN_CACHE_FOLDER)
+    - task: MavenAuthenticate@0
+      displayName: 'Maven Auth'
+      inputs:
+        artifactsFeeds: 'lbi-maven'
+    - task: Maven@3
+      displayName: 'Maven Package'
+      inputs:
+        mavenPomFile: 'api/pom.xml'
+        mavenOptions: '$(MAVEN_OPTS)'
+        jdkVersionOption: 1.17
+        goals: 'clean package -PDEV'
+    - task: Docker@2
+      inputs:
+        containerRegistry: $(containerRegistry)
+        command: 'buildAndPush'
+        Dockerfile: 'api/Dockerfile'
+        tags: '$(tag)'
+        repository: '$(imageRepository)'
+    - task: AzureWebAppContainer@1
+      inputs:
+        azureSubscription: $(azureSubscription)
+        appName: $(webAppName)
+        containers: '$(containerRepo)/$(imageRepository):$(tag)'

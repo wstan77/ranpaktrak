@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+  namespace="com.lbisoft.core.app.db.mapper.custom.QuickSearchExtendedMapper">
+
+  <resultMap id="QuickSearchPersonMap" type="com.lbisoft.core.app.components.person.model.QuickSearchPerson">
+    <result column="person_id" property="personId" />
+    <result column="record_status_lk" property="recordStatusLk" />
+    <result column="person_type_lk" property="personTypeLk" />
+    <result column="last_name" property="lastName" />
+    <result column="first_name" property="firstName" />
+    <result column="display_name" property="displayName" />
+    <result column="legal_last_name" property="legalLastName" />
+    <result column="legal_first_name" property="legalFirstName" />
+    <result column="date_of_birth" property="dateOfBirth" />
+    <result column="person_type_lk" property="personTypeLk"/>
+  </resultMap>
+
+  <resultMap id="QuickSearchTagMap"
+    type="com.lbisoft.core.app.components.quicksearch.model.QuickSearchTag">
+    <result column="tag_type" jdbcType="VARCHAR"
+      property="type" />
+    <result column="tag_id" jdbcType="INTEGER" property="id" />
+    <result column="display_name" jdbcType="VARCHAR"
+      property="displayName" />
+  </resultMap>
+
+  <resultMap id="QuickSearchUserMap"
+    type="com.lbisoft.core.app.components.user.model.UserInfo">
+    <result column="last_name" property="lastName" />
+    <result column="first_name" property="firstName" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="record_status_lk" property="recordStatusLk" />
+  </resultMap>
+
+  <select id="getQuickSearchPersons" resultMap="QuickSearchPersonMap">
+    select
+    p.person_id,
+    p.record_status_lk,
+    p.display_name,
+    p.date_of_birth,
+    p.person_type_lk,
+    p.last_name,
+    p.first_name,
+    p.legal_last_name,
+    p.legal_first_name
+
+    from persons p
+    where
+      p.record_status_lk = 'AP'
+      and (
+          <!-- enter criteria for quick search persons here -->
+          1=1
+      )
+  </select>
+
+  <select id="getQuickSearchPersonById" resultMap="QuickSearchPersonMap">
+    select
+    p.person_id,
+    p.record_status_lk,
+    p.display_name,
+    p.date_of_birth,
+    p.person_type_lk,
+    coalesce(p.last_name, p.legal_last_name) as last_name,
+    coalesce(p.first_name, p.legal_first_name) as first_name
+    from persons p
+    where
+      p.person_id = #{personId}
+  </select>
+
+</mapper>

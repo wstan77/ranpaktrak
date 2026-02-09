@@ -1,0 +1,40 @@
+{
+  "files.exclude": {
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true,
+    "**/.class": true,
+    "**/target": true,
+    "**/target-*": true
+  },
+  "[typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
+    },
+    "editor.formatOnSave": true
+  },
+  "[java]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
+    },
+    "editor.formatOnSave": true
+  },
+  "[scss]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
+    },
+    "editor.formatOnSave": true
+  },
+  "java.test.config": {
+    "vmArgs": ["--add-opens=java.base/java.lang=ALL-UNNAMED"]
+  },
+  "java.completion.favoriteStaticMembers": ["org.junit.Assert.*", "org.assertj.core.api.Assertions.assertThat"],
+  "java.sources.organizeImports.staticStarThreshold": 1,
+  "java.sources.organizeImports.starThreshold": 10,
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.compile.nullAnalysis.mode": "automatic"
+}

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lbisoft.core.app.db.mapper.custom.TaskExtendedMapper">
+
+  <resultMap id="TaskMap" type="com.lbisoft.core.app.components.task.model.Task" extends="com.lbisoft.core.app.db.mapper.generated.TaskDbMapper.BaseResultMap">
+    <result column="reference_name" property="referenceName" />
+  </resultMap>
+
+  <select id="getTasksForUser" resultMap="TaskMap">
+    SELECT t.*, reference_name(reference_type_lk, reference_id) as reference_name
+    FROM tasks t
+    WHERE
+    t.record_status_lk != 'DL'
+    <if test="filters.searchText != null">
+      and (
+        t.task ilike '%' || #{filters.searchText} || '%'
+        or t.description ilike '%' || #{filters.searchText} || '%'
+      )
+    </if>
+    <if test="!filters.allFlg">
+      and
+      (
+        <!-- By default, show only tasks created by the user or assigned to the user or the user's subordinates -->
+        t.create_user_id = #{userId}
+        or t.assigned_user_id = #{userId}
+        or t.assigned_user_group_id IN (SELECT user_group_id FROM user_group_users WHERE user_id = #{userId})
+        or t.assigned_user_id IN (SELECT subordinate_user_id FROM user_subordinates WHERE user_id = #{userId})
+      )
+    </if>
+    and <if test="filters.archivedFlg">NOT</if> (
+      <!-- A task is considered active if it's any status besides COMPLETED or CANCELLED.
+        A completed tasks is considered active if it's been completed within the last 5 days. -->
+      t.task_status_lk not in ('COMPLETED', 'CANCELLED')
+      or (t.task_status_lk = 'COMPLETED' and t.last_change_date > (now() - interval '5 days'))
+    )
+    and exists (
+      SELECT * from vw_permissions vp where vp.current_user_id = #{userId} and vp.permission_lk = 'TASKS'
+      and (
+        vp.permission_target_lk = 'ALL'
+        or (
+          vp.permission_target_lk = 'OWN' and t.create_user_id = #{userId}
+        ) or (
+          vp.permission_target_lk = 'SUB' and t.create_user_id = vp.owner_user_id
+        )
+      )
+    )
+    ORDER BY t.last_change_date DESC
+    LIMIT #{filters.limit} OFFSET #{filters.skip}
+  </select>
+
+  <select id="getTasksForReference" resultMap="TaskMap">
+    SELECT t.*, reference_name(reference_type_lk, reference_id) as reference_name
+    FROM tasks t
+    WHERE
+    t.record_status_lk != 'DL'
+    and t.reference_type_lk = #{referenceTypeLk}
+    and t.reference_id = #{referenceId}
+    and <if test="filters.archivedFlg">NOT</if> (
+      <!-- A task is considered active if it's any status besides COMPLETED or CANCELLED.
+        A completed tasks is considered active if it's been completed within the last 5 days. -->
+      t.task_status_lk not in ('COMPLETED', 'CANCELLED')
+      or (t.task_status_lk = 'COMPLETED' and t.last_change_date > (now() - interval '3 days'))
+    )
+    and exists (
+      SELECT * from vw_permissions vp where vp.current_user_id = #{userId} and vp.permission_lk = 'TASKS'
+      and (
+        vp.permission_target_lk = 'ALL'
+        or (
+          vp.permission_target_lk = 'OWN' and t.create_user_id = #{userId}
+        ) or (
+          vp.permission_target_lk = 'SUB' and t.create_user_id = vp.owner_user_id
+        )
+      )
+    )
+    ORDER BY t.last_change_date DESC
+    LIMIT #{filters.limit} OFFSET #{filters.skip}
+  </select>
+
+  <select id="getTaskById" resultMap="TaskMap">
+    SELECT t.*, reference_name(reference_type_lk, reference_id) as reference_name
+    FROM tasks t
+    WHERE
+    t.record_status_lk != 'DL'
+    and t.task_id = #{taskId}
+    and exists (
+      SELECT * from vw_permissions vp where vp.current_user_id = #{userId} and vp.permission_lk = 'TASKS'
+      and (
+        vp.permission_target_lk = 'ALL'
+        or (
+          vp.permission_target_lk = 'OWN' and t.create_user_id = #{userId}
+        ) or (
+          vp.permission_target_lk = 'SUB' and t.create_user_id = vp.owner_user_id
+        )
+      )
+    )
+  </select>
+
+  <select id="getLastCheckTime">
+    SELECT ua.create_date
+    FROM user_activities ua
+    WHERE ua.create_user_id = #{userId}
+    and ua.activity_lk = 'CHECK_TASKS'
+    ORDER BY ua.create_date DESC
+    LIMIT 1
+  </select>
+
+</mapper>

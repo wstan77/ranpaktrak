@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lbisoft.core.app.db.mapper.custom.NoteExtendedMapper">
+
+  <resultMap id="NoteSearchMap" type="com.lbisoft.core.app.components.notes.model.Note">
+    <result column="note_id" jdbcType="INTEGER" property="noteId" />
+    <result column="note_type_lk" jdbcType="VARCHAR" property="noteTypeLk" />
+    <result column="note_date" jdbcType="DATE" property="noteDate" />
+    <result column="subject" jdbcType="VARCHAR" property="subject" />
+    <result column="comments" jdbcType="VARCHAR" property="comments" />
+    <result column="attachment" property="attachment" />
+    <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+    <result column="file_ext" jdbcType="VARCHAR" property="fileExt" />
+    <result column="create_user_id" jdbcType="INTEGER" property="createUserId" />
+    <result column="record_status_lk" jdbcType="VARCHAR" property="recordStatusLk" />
+    <result column="last_change_date" property="lastChangeDate" />
+    <result column="owner_name" property="ownerName" />
+    <result column="read_flg" property="readFlg" />
+  </resultMap>
+  <resultMap id="NoteReferenceSearchMap" type="com.lbisoft.core.app.components.notes.model.NoteReference">
+   	<result column="note_reference_id" jdbcType="INTEGER" property="noteReferenceId"/>
+    <result column="note_id" jdbcType="INTEGER" property="noteId"/>
+    <association property="tag" javaType="com.lbisoft.core.app.components.quicksearch.model.QuickSearchTag">
+      <result column="reference_type_lk" jdbcType="VARCHAR" property="type"/>
+      <result column="reference_id" jdbcType="INTEGER" property="id"/>
+      <result column="display_name" jdbcType="VARCHAR" property="displayName"/>
+      <result column="active_flg" jdbcType="BIT" property="activeFlg"/>
+      <result column="icon" property="icon"/>
+    </association>
+  </resultMap>
+
+  <select id="search" parameterType="map" resultMap="NoteSearchMap">
+	select
+	 n.note_id
+	 ,n.note_type_lk
+	 ,n.note_date
+	 ,n.subject
+	 ,n.comments
+	 ,n.file_name
+	 ,n.create_user_id
+	 ,n.record_status_lk
+   ,n.last_change_date
+   ,coalesce(concat(owner.first_name, ' ', owner.last_name), 'Archived') as owner_name
+   ,CASE WHEN has_read_flg.related_id is not null THEN 1 ELSE 0 END as read_flg
+	from notes n
+  left join users owner on owner.user_id = n.create_user_id and owner.record_status_lk != 'DL'
+  join lk_note_types lknt on lknt.note_type_lk = n.note_type_lk
+  left join (SELECT related_id from user_activities where create_user_id = #{userId} and activity_lk = 'GET_NOTE' LIMIT 1) has_read_flg on has_read_flg.related_id = n.note_id
+	where n.record_status_lk = 'AP'
+	and lknt.active_flg = 1
+	<!--and nos.has_permission(#{userId}, 'NOTES', 'READ', n.create_user_id) = 1-->
+    <if test="form.tagKeys != null and form.tagKeys.size > 0">
+      and exists(select * from note_references nr where nr.note_id = n.note_id
+      and CONCAT('[', nr.reference_type_lk, '_', nr.reference_id, ']') in (
+        <foreach item="tagKey" collection="form.tagKeys" separator=",">
+          #{tagKey}
+        </foreach>
+      ))
+    </if>
+    <if test="form.userIds != null and form.userIds.size > 0">
+      and n.create_user_id in (
+        <foreach item="userIds" collection="form.userIds" separator=",">
+          #{userIds}
+        </foreach>
+      )
+    </if>
+    <if test="form.dateFrom != null">
+      and n.note_date &gt;= #{form.dateFrom}
+    </if>
+    <if test="form.dateTo != null">
+      and n.note_date &lt;= #{form.dateTo}
+    </if>
+    <if test="form.noteTypeLk != null">
+      and n.note_type_lk = #{form.noteTypeLk}
+    </if>
+    <if test="form.hasFile != null and form.hasFile">
+      and n.attachment is not null
+    </if>
+    <if test="form.hasFile != null and !form.hasFile">
+      and n.attachment is null
+    </if>
+    order by n.note_date desc, n.create_date desc
+    LIMIT (#{form.limit})
+  </select>
+  <select id="searchReferences" parameterType="map" resultMap="NoteReferenceSearchMap">
+	select distinct
+    nr.note_reference_id
+    ,nr.note_id
+    ,nr.reference_type_lk
+    ,nr.reference_id
+    ,case
+      when nr.reference_type_lk = 'PERSON' then p.display_name
+      else COALESCE(concat(u.first_name, ' ', u.last_name), 'Archived')
+    end as display_name
+    ,case
+      when (
+        case
+          when nr.reference_type_lk = 'PERSON' then p.record_status_lk
+          else u.record_status_lk
+        end
+      ) = 'AP' then 1
+      else 0
+    end as active_flg
+	from note_references nr
+  left join notes n on n.note_id = nr.note_id
+	left join persons p on p.person_id = nr.reference_id and nr.reference_type_lk = 'PERSON'
+	left join users u on u.user_id = nr.reference_id and nr.reference_type_lk = 'USER' and u.record_status_lk != 'DL'
+	<where>
+	  <if test="noteIds != null and noteIds.size > 0">
+      and nr.note_id in (
+        <foreach item="noteId" collection="noteIds" separator=",">
+          #{noteId}
+        </foreach>
+      )
+    </if>
+  </where>
+  </select>
+  <delete id="cleanupUnsavedNotes">
+	<if test="noteIds != null and noteIds.size > 0">
+	 delete from notes
+     where note_id in (
+        <foreach item="noteId" collection="noteIds" separator=",">
+          #{noteId}
+        </foreach>
+      )
+    </if>
+  </delete>
+  <delete id="cleanupUnsavedNoteReferences">
+  	<if test="noteIds != null and noteIds.size > 0">
+	 delete from note_references
+     where note_id in (
+        <foreach item="noteId" collection="noteIds" separator=",">
+          #{noteId}
+        </foreach>
+      )
+    </if>
+  </delete>
+  <select id="getNoteIdsToDelete" resultType="java.lang.Integer">
+  	select note_id from notes
+	where record_status_lk = 'UN'
+	and create_date &lt; NOW() + INTERVAL '1 day'
+  </select>
+</mapper>

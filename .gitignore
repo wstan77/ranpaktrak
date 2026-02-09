@@ -1,0 +1,51 @@
+/api/target*/
+/api/db/
+!/api/.mvn/wrapper/maven-wrapper.jar
+
+/webapp/node_modules/
+/webapp/.angular/
+/webapp/dist/
+/webapp/coverage/
+/webapp/sqltools_*.log
+/webapp/yarn-error.log
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### WinMerge ###
+*.bak
+
+### NetBeans ###
+/api/nbproject/private/
+/api/build/
+/api/nbbuild/
+/api/dist/
+/api/nbdist/
+/api/.nb-gradle/
+api/.eclipse-pmd
+
+api/\.checkstyle
+/target/
+api/logs/
+
+.DS_Store
+api/secrets/*decrypted.properties
+
+# Build Archives
+*.tar*
+
+### Dependency Checker ###
+api/dependency-checker-output/
+api/.env

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lbisoft.core.app.db.mapper.custom.MachineExtendedMapper">
+
+  <select id="getMachineBySerialNumber" parameterType="map" resultMap="com.lbisoft.core.app.db.mapper.generated.MachineDbMapper.BaseResultMap">
+  	select top 1 * 
+    from dbo.machines 
+    where upper(serial_number) = #{sn} 
+    OR upper(legacy_serial_number) = #{sn}
+  </select>
+
+    <select id="getUnscannedMachines" parameterType="map" resultMap="com.lbisoft.core.app.db.mapper.generated.MachineDbMapper.BaseResultMap">
+        select * 
+        from dbo.machines 
+        where customer_id = #{customerId}
+        and upper(serial_number) not in (select upper(serial_number) from dbo.scans where batch_uuid = #{batchUUID})
+        and upper(legacy_serial_number) not in (select upper(serial_number) from dbo.scans where batch_uuid = #{batchUUID})
+  </select>
+
+  
+</mapper>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lbisoft.core.app.db.mapper.custom.UserGroupExtendedMapper">
+
+
+  <update id="updateActiveFlgs">
+    <!-- Set active_flg to true if and only if there is at least one user in the group -->
+    update user_groups ug
+    set active_flg = (
+      select case when count(*) &gt; 0 then 1 else 0 end
+      from user_group_users ugu
+      where ugu.user_group_id = ug.user_group_id
+    )
+  </update>
+
+</mapper>

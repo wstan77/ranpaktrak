@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lbisoft.core.app.db.mapper.custom.PersonExtendedMapper">
+
+  <resultMap id="PersonMap" type="com.lbisoft.core.app.components.person.model.Person">
+    <id column="person_id" jdbcType="INTEGER" property="personId" />
+    <result column="first_name" jdbcType="VARCHAR" property="firstName" />
+    <result column="last_name" jdbcType="VARCHAR" property="lastName" />
+    <result column="person_type_lk" jdbcType="VARCHAR" property="personTypeLk"/>
+    <result column="display_name" jdbcType="VARCHAR" property="displayName" />
+    <result column="date_of_birth" jdbcType="DATE" property="dateOfBirth" />
+    <result column="record_status_lk" jdbcType="VARCHAR" property="recordStatusLk"/>
+  </resultMap>
+
+  <select id="search" parameterType="map" resultMap="PersonMap">
+    <include refid="personSearchLite" />
+    <where>
+      <if test="form.name != null and form.name != ''">
+          and (p.display_name ilike concat('%', #{form.name}, '%')
+          OR p.first_name ilike concat(#{form.name}, '%')
+          OR p.last_name ilike concat(#{form.name}, '%'))
+      </if>
+      <if test="form.dateOfBirthTo != null">
+          and p.date_of_birth &lt;= #{form.dateOfBirthTo}
+      </if>
+      <if test="form.personTypeLks != null and form.personTypeLks.size > 0">
+          and p.person_type_lk in (
+          <foreach item="personTypeLk" collection="form.personTypeLks" separator=",">
+              #{personTypeLk}
+          </foreach>
+          )
+      </if>
+      and p.record_status_lk = 'AP'
+    </where>
+    ORDER BY
+    p.display_name, coalesce(p.last_name, p.legal_last_name), coalesce(p.first_name, p.legal_first_name), p.person_id
+  </select>
+
+  <select id = "getNewPersonMatches" parameterType="map" resultMap="PersonMap">
+    <include refid="personSearchLite"/>
+    <where>
+      p.last_name ilike #{newPerson.lastName}
+      and p.first_name ilike #{newPerson.firstName}
+      and p.record_status_lk = 'AP'
+    </where>
+  </select>
+
+   <sql id="personSearchLite">
+    select
+    p.person_id
+    ,p.first_name
+    ,p.last_name
+    ,p.person_type_lk
+    ,p.display_name
+    ,p.date_of_birth
+    ,p.record_status_lk
+
+    from persons p
+  </sql>
+
+
+
+</mapper>

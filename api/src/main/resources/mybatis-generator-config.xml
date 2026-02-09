@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+  <context id="default" targetRuntime="MyBatis3">
+
+    <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"></plugin>
+    <plugin type="org.mybatis.generator.plugins.FluentBuilderMethodsPlugin"></plugin>
+    <plugin type="org.mybatis.generator.plugins.ToStringPlugin"></plugin>
+    <plugin type="org.mybatis.generator.plugins.MapperAnnotationPlugin"></plugin>
+    <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"></plugin>
+    <!-- <plugin type="org.mybatis.generator.plugins.SerializablePlugin"></plugin> -->
+    <plugin type="org.mybatis.generator.plugins.VirtualPrimaryKeyPlugin"></plugin>
+
+    <plugin type="com.lbisoft.mybatis.generator.plugins.ConcurrencyPlugin">
+      <property name="changeDateField" value="SYSTEM_LAST_CHANGE_DATE" />
+      <property name="fetchDateName" value="fetchDate" />
+      <property name="dbName" value="ranpaktrak2" />
+    </plugin>
+    <plugin type="com.lbisoft.mybatis.generator.plugins.UpdateModifiedPlugin"></plugin>
+    <plugin type="com.lbisoft.mybatis.generator.plugins.RootInterfacePlugin">
+      <property name="modelInterface" value="com.lbisoft.core.framework.dao.db.DbModel" />
+      <property name="mapperInterface" value="com.lbisoft.core.framework.dao.db.DbMapper" />
+      <property name="mapperInterfaceWithoutPrimaryKey"
+        value="com.lbisoft.core.framework.dao.db.DbMapperWithoutPrimaryKey" />
+      <property name="exampleInterface" value="com.lbisoft.core.framework.dao.db.DbExample" />
+    </plugin>
+    <plugin type="com.lbisoft.mybatis.generator.plugins.AddCreateExamplePlugin"></plugin>
+    <plugin type="com.lbisoft.mybatis.generator.plugins.NoAuditFieldsPlugin"></plugin>
+
+
+    <commentGenerator>
+      <property name="suppressDate" value="true" />
+    </commentGenerator>
+
+    <jdbcConnection driverClass="com.microsoft.sqlserver.jdbc.SQLServerDriver" connectionURL="@database.url@"
+      userId="@database.username@" password="@database.password@"></jdbcConnection>
+
+    <javaTypeResolver>
+      <property name="forceBigDecimals" value="false" />
+      <property name="useJSR310Types" value="true" />
+    </javaTypeResolver>
+
+    <javaModelGenerator targetPackage="com.lbisoft.core.app.db.model.generated"
+      targetProject="src/main/java">
+      <property name="enableSubPackages" value="false" />
+    </javaModelGenerator>
+
+    <sqlMapGenerator targetPackage="com.lbisoft.core.app.db.mapper.generated"
+      targetProject="src/main/resources">
+      <property name="enableSubPackages" value="false" />
+    </sqlMapGenerator>
+
+    <javaClientGenerator type="XMLMAPPER" targetPackage="com.lbisoft.core.app.db.mapper.generated"
+      targetProject="src/main/java">
+      <property name="enableSubPackages" value="false" />
+    </javaClientGenerator>
+
+    <!-- Table Definitions 
+    <table tableName="addresses" domainObjectName="AddressDb" schema="dbo">
+      <generatedKey column="address_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+
+    <table tableName="customers" domainObjectName="CustomerDb" schema="dbo">
+      <generatedKey column="customer_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+
+    <table tableName="emails" domainObjectName="EmailDb" schema="dbo">
+      <generatedKey column="email_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+
+    <table tableName="job_logs" domainObjectName="JobLogDb" schema="dbo">
+      <generatedKey column="job_log_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+
+    <table tableName="lk_address_types" domainObjectName="LkAddressTypeDb" schema="dbo"></table>
+    <table tableName="lk_countries" domainObjectName="LkCountryDb" schema="dbo"></table>
+    <table tableName="lk_email_types" domainObjectName="LkEmailTypeDb" schema="dbo"></table>
+    <table tableName="lk_eyewears" domainObjectName="LkEyewearDb" schema="dbo"></table>
+    <table tableName="lk_genders" domainObjectName="LkGenderDb" schema="dbo"></table>
+    <table tableName="lk_issue_status" domainObjectName="LkIssueStatusDb" schema="dbo"></table>
+    <table tableName="lk_issue_types" domainObjectName="LkIssueTypeDb" schema="dbo"></table>
+    <table tableName="lk_job_types" domainObjectName="LkJobTypeDb" schema="dbo"></table>
+    <table tableName="lk_languages" domainObjectName="LkLanguageDb" schema="dbo"></table>
+    <table tableName="lk_machine_types" domainObjectName="LkMachineTypeDb" schema="dbo"></table>
+    <table tableName="lk_note_types" domainObjectName="LkNoteTypeDb" schema="dbo"></table>
+    <table tableName="lk_permission_levels" domainObjectName="LkPermissionLevelDb" schema="dbo"></table>
+    <table tableName="lk_permission_targets" domainObjectName="LkPermissionTargetDb" schema="dbo"></table>
+    <table tableName="lk_permissions" domainObjectName="LkPermissionDb" schema="dbo"></table>
+    <table tableName="lk_person_types" domainObjectName="LkPersonTypeDb" schema="dbo"></table>
+    <table tableName="lk_phone_types" domainObjectName="LkPhoneTypeDb" schema="dbo"></table>
+    <table tableName="lk_record_status" domainObjectName="LkRecordStatusDb" schema="dbo"></table>
+    <table tableName="lk_reference_types" domainObjectName="LkReferenceTypeDb" schema="dbo"></table>
+    <table tableName="lk_regions" domainObjectName="LkRegionDb" schema="dbo"></table>
+    <table tableName="lk_scan_types" domainObjectName="LkScanTypeDb" schema="dbo"></table>
+    <table tableName="lk_scan_result_types" domainObjectName="LkScanResultTypeDb" schema="dbo"></table>
+    <table tableName="lk_social_profiles" domainObjectName="LkSocialProfileDb" schema="dbo"></table>
+    <table tableName="lk_source_systems" domainObjectName="LkSourceSystemDb" schema="dbo"></table>
+    <table tableName="lk_states" domainObjectName="LkStateDb" schema="dbo"></table>
+    <table tableName="lk_system_date_types" domainObjectName="LkSystemDateTypeDb" schema="dbo"></table>
+    <table tableName="lk_task_statuses" domainObjectName="LkTaskStatusDb" schema="dbo"></table>   
+    
+    <table tableName="machines" domainObjectName="MachineDb" schema="dbo">
+      <generatedKey column="machine_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+
+    <table tableName="notes" domainObjectName="NoteDb" schema="dbo">
+      <generatedKey column="note_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="note_references" domainObjectName="NoteReferenceDb" schema="dbo"></table>
+
+    <table tableName="persons" domainObjectName="PersonDb" schema="dbo">
+      <generatedKey column="person_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="person_addresses" domainObjectName="PersonAddressDb" schema="dbo"></table>
+    <table tableName="person_emails" domainObjectName="PersonEmailDb" schema="dbo"></table>
+    <table tableName="person_history" domainObjectName="PersonHistoryDb" schema="dbo"></table>
+    <table tableName="person_phone_numbers" domainObjectName="PersonPhoneNumberDb" schema="dbo"></table>
+    <table tableName="person_social_profiles" domainObjectName="PersonSocialProfileDb"
+      schema="dbo">
+      <generatedKey column="person_social_profile_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="person_xrefs" domainObjectName="PersonXrefDb" schema="dbo"></table>
+
+    <table tableName="phone_numbers" domainObjectName="PhoneNumberDb" schema="dbo">
+      <generatedKey column="phone_number_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+
+    <table tableName="reported_issues" domainObjectName="ReportedIssueDb" schema="dbo">
+      <generatedKey column="reported_issue_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="roles" domainObjectName="RoleDb" schema="dbo">
+      <generatedKey column="role_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="role_permissions" domainObjectName="RolePermissionDb" schema="dbo"></table>
+
+    <table tableName="scans" domainObjectName="ScanDb" schema="dbo">
+      <generatedKey column="scan_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="scan_results" domainObjectName="ScanResultDb" schema="dbo">
+      <generatedKey column="scan_result_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+
+    <table tableName="system_dates" domainObjectName="SystemDateDb" schema="dbo"></table>
+    <table tableName="system_values" domainObjectName="SystemValueDb" schema="dbo"></table>
+
+
+    <table tableName="tasks" domainObjectName="TaskDb" schema="dbo">
+      <generatedKey column="task_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="threads" domainObjectName="ThreadDb" schema="dbo">
+      <generatedKey column="thread_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="thread_messages" domainObjectName="ThreadMessageDb" schema="dbo">
+      <generatedKey column="thread_message_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="thread_message_attachments" domainObjectName="ThreadMessageAttachmentDb"
+      schema="dbo">
+      <generatedKey column="thread_message_attachment_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="thread_message_tags" domainObjectName="ThreadMessageTagDb" schema="dbo">
+      <generatedKey column="thread_message_tag_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="thread_read_status" domainObjectName="ThreadReadStatusDb" schema="dbo"></table>
+
+    <table tableName="users" domainObjectName="UserDb" schema="dbo">
+      <generatedKey column="user_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="user_activities" domainObjectName="UserActivityDb" schema="dbo">
+      <generatedKey column="user_activity_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="user_groups" domainObjectName="UserGroupDb" schema="dbo">
+      <generatedKey column="user_group_id" sqlStatement="JDBC"></generatedKey>
+    </table>
+    <table tableName="user_group_users" domainObjectName="UserGroupUserDb" schema="dbo"></table>
+    <table tableName="user_roles" domainObjectName="UserRoleDb" schema="dbo"></table>
+    <table tableName="user_subordinates" domainObjectName="UserSubordinateDb" schema="dbo"></table>
+
+    <table tableName="vw_person_addresses" domainObjectName="PersonAddressVw" schema="dbo">
+      <property name="virtualKeyColumns" value="person_id,address_id" />
+    </table>
+    <table tableName="vw_person_emails" domainObjectName="PersonEmailVw" schema="dbo">
+      <property name="virtualKeyColumns" value="person_id,email_id" />
+    </table>
+    <table tableName="vw_person_phone_numbers" domainObjectName="PersonPhoneNumberVw"
+      schema="dbo">
+      <property name="virtualKeyColumns" value="person_id,phone_number_id" />
+    </table>
+    -->
+
+  </context>
+</generatorConfiguration>

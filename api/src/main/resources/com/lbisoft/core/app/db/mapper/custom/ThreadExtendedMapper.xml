@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lbisoft.core.app.db.mapper.custom.ThreadExtendedMapper">
+
+  <resultMap id="ThreadMap" type="com.lbisoft.core.app.components.thread.model.MessageThread">
+    <id column="thread_id" property="threadId" />
+    <result column="subject" property="subject" />
+    <result column="reference_type_lk" property="referenceTypeLk" />
+    <result column="reference_id" property="referenceId" />
+    <result column="reference_name" property="referenceName" />
+    <result column="last_read_message_id" property="lastReadMessageId" />
+    <result column="unread_count" property="unreadCount" />
+  </resultMap>
+  <sql id="selectLastReadMessageId">
+
+  </sql>
+
+  <sql id="baseSelect">
+    select
+      th.*,
+      reference_name(reference_type_lk, reference_id) as reference_name,
+      trs.last_read_message_id,
+      (select count(*) from thread_messages where thread_id = th.thread_id and (trs.last_read_message_id is null or thread_message_id &gt; trs.last_read_message_id)) as unread_count
+    from threads th
+    left join thread_read_status trs on trs.thread_id = th.thread_id and trs.user_id = #{userId}
+    where th.record_status_lk = 'AP'
+    and exists (
+      SELECT * from vw_permissions vp where vp.current_user_id = #{userId} and vp.permission_lk = 'THREADS'
+      and (
+        vp.permission_target_lk = 'ALL'
+        or (
+          vp.permission_target_lk = 'OWN' and th.create_user_id = #{userId}
+        ) or (
+          vp.permission_target_lk = 'SUB' and vp.owner_user_id = th.create_user_id
+        )
+      )
+    )
+  </sql>
+
+  <select id="getThreadsByReference" resultMap="ThreadMap">
+    <include refid="baseSelect"/>
+    and th.reference_type_lk = #{referenceTypeLk}
+    and th.reference_id = #{referenceId}
+  </select>
+
+  <select id="getThreadsByIds" resultMap="ThreadMap">
+    <include refid="baseSelect"/>
+    and th.thread_id in
+      <foreach item="threadId" collection="threadIds" open="(" separator="," close=")">
+        #{threadId}
+      </foreach>
+  </select>
+
+  <select id="getThreadsByParticipant" resultMap="ThreadMap">
+    <include refid="baseSelect"/>
+    and (
+      th.thread_id in (
+        select thread_id from thread_messages where create_user_id = #{userId}
+      ) or th.thread_id in (
+        select thread_id
+        from thread_message_tags tmt
+        join thread_messages tm on tm.thread_message_id = tmt.thread_message_id
+        where (
+          (tmt.reference_type_lk = 'USER' and reference_id = #{userId})
+          or (tmt.reference_type_lk = 'USER_GROUP' and reference_id in (select user_group_id from user_group_users where user_id = #{userId}))
+        )
+      )
+    )
+  </select>
+
+</mapper>

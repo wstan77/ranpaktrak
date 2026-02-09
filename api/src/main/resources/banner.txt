@@ -1,0 +1,18 @@
+${AnsiColor.MAGENTA}
+${AnsiColor.MAGENTA}              ^
+${AnsiColor.MAGENTA}           /#...#\
+${AnsiColor.MAGENTA}        /#.........#\
+${AnsiColor.MAGENTA}     /#...............#\
+${AnsiColor.MAGENTA}  /#....................#\
+${AnsiColor.MAGENTA}|#..._........____...._...#|${AnsiColor.DEFAULT}  :::::::-. .-:.     ::-.:::.    :::.  :::.     .::::::.::::::::::::.-:.     ::-.
+${AnsiColor.MAGENTA}|#..| |......|  _ \..(_)..#|${AnsiColor.DEFAULT}   ;;,   `';,';;.   ;;;;'`;;;;,  `;;;  ;;`;;   ;;;`    `;;;;;;;;'''' ';;.   ;;;;'
+${AnsiColor.MAGENTA}|#..| |......| |_) |.._...#|${AnsiColor.DEFAULT}   `[[     [[  '[[,[[['    [[[[[. '[[ ,[[ '[[, '[==/[[[[,    [[        '[[,[[['
+${AnsiColor.MAGENTA}|#..| |......|  _ < .| |..#|${AnsiColor.DEFAULT}    $$,    $$    c$$"      $$$ "Y$c$$c$$$cc$$$c  '''    $    $$          c$$"
+${AnsiColor.MAGENTA}|#..| |____..| |_) |.| |..#|${AnsiColor.DEFAULT}    888_,o8P'  ,8P"`       888    Y88 888   888,88b    dP    88,       ,8P"`
+${AnsiColor.MAGENTA}|#..|______|.|____/..|_|..#|${AnsiColor.DEFAULT}    MMMMP"`   mM"          MMM     YM YMM   ""`  "YMmMY"     MMM      mM"
+${AnsiColor.MAGENTA}  \#....................#/
+${AnsiColor.MAGENTA}     \#...............#/
+${AnsiColor.MAGENTA}        \#.........#/
+${AnsiColor.MAGENTA}           \#...#/
+${AnsiColor.MAGENTA}              v
+${AnsiColor.DEFAULT}

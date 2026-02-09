@@ -1,0 +1,22 @@
+{
+  "build": {
+    "development": {
+      "extends": "production",
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+        "android": {
+          "buildType": "apk"
+        },
+        "env": {
+            "EXPO_PUBLIC_API_URL": "http://192.168.101.119:8080/api",
+            "EXPO_PUBLIC_AZURE_AD_CLIENT_ID": "f9c01ec2-d3e0-4917-b0cb-7dde50504f31",
+            "EXPO_PUBLIC_AZURE_AD_TENANT_ID": "7fed4e83-14ef-449b-84b0-39c2cdb32bb2",
+            "EXPO_PUBLIC_OPEN_ID_ISSUER_URL": "https://a6aib4fnb.accounts.ondemand.com/",
+            "EXPO_PUBLIC_OPEN_ID_CLIENT_ID": "c9e163c5-9501-4885-9ed3-99e3d038500f"
+          }
+      },
+    "production": {}
+  }
+}

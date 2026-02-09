@@ -1,0 +1,8 @@
+version: "3.7"
+services:
+  deploy:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ranpaklbidocker.azurecr.io/api:0.0.1
